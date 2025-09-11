@@ -37,15 +37,15 @@ You will be required to submit a link to your GitHub, as well as screenshots of 
 Please evaluate your system on the following questions:
 
 1. Explain the concept of object-oriented programming in simple terms to a complete beginner. 
-    - Aspect Tested:
+    - Aspect Tested: Teaching ability.
 2. Read the following paragraph and provide a concise summary of the key points…
-    - Aspect Tested:
+    - Aspect Tested: Summarization
 3. Write a short, imaginative story (100–150 words) about a robot finding friendship in an unexpected place.
-    - Aspect Tested:
+    - Aspect Tested:Creativity.
 4. If a store sells apples in packs of 4 and oranges in packs of 3, how many packs of each do I need to buy to get exactly 12 apples and 9 oranges?
-    - Aspect Tested:
+    - Aspect Tested:Problem solving and explanation.
 5. Rewrite the following paragraph in a professional, formal tone…
-    - Aspect Tested:
+    - Aspect Tested:Rephrazing
 
 This "vibe check" now serves as a baseline, of sorts, to help understand what holes your application has.
 
@@ -58,7 +58,7 @@ This "vibe check" now serves as a baseline, of sorts, to help understand what ho
 #### ❓Question #1:
 
 What are some limitations of vibe checking as an evaluation tool?
-##### ✅ Answer:
+##### ✅ Answer: The vibe checking is a subjective tool to evaluate LLMs, non measurable, non consistent. Particularly for uknown fields it is hard to use vibe checking as a tool to evaluate the model when the tester does not have the knowledge to assess the response in the first place (health care, engineering, biology etc).
 
 ### 🚧 Advanced Build (OPTIONAL):
 
@@ -69,13 +69,12 @@ Please make adjustments to your application that you believe will improve the vi
 #### 🏗️ Activity #1
 ##### Adjustments Made:
 - _describe adjustment(s) here_
-
+I set a developerMessage for each case. This working properly for each type of questions. Also improved the UI with css 
 ##### Results:
 1. _Comment here how the change(s) impacted the vibe check of your system_
-2. 
-3. 
-4. 
-5.
+2. Added bullet points and bolds for semantic points
+3. More professional tone
+4. Direct mathematical answers with one sentence explanation
 
 
 ## Submitting Your Homework
