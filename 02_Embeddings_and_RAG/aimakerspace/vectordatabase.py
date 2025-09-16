@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import List, Tuple, Callable
 from aimakerspace.openai_utils.embedding import EmbeddingModel
 import asyncio
+from scipy.spatial.distance import euclidean, cityblock
 
 
 def cosine_similarity(vector_a: np.array, vector_b: np.array) -> float:
@@ -79,3 +80,47 @@ if __name__ == "__main__":
         "I think fruit is awesome!", k=k, return_as_text=True
     )
     print(f"Closest {k} text(s):", relevant_texts)
+
+class SimpleEnhancedVectorDatabase(VectorDatabase):
+    """Simple enhancement to existing VectorDatabase - just adds distance metrics"""
+    
+    def __init__(self, embedding_model=None):
+        super().__init__(embedding_model)
+        # Add the three distance metrics
+        self.distance_metrics = {
+            'cosine': self._cosine_similarity,
+            'euclidean': self._euclidean_distance, 
+            'manhattan': self._manhattan_distance
+        }
+    
+    def _cosine_similarity(self, vector_a: np.array, vector_b: np.array) -> float:
+        """Your existing cosine similarity"""
+        from aimakerspace.vectordatabase import cosine_similarity
+        return cosine_similarity(vector_a, vector_b)
+    
+    def _euclidean_distance(self, vector_a: np.array, vector_b: np.array) -> float:
+        """Euclidean distance converted to similarity"""
+        distance = euclidean(vector_a, vector_b)
+        return 1 / (1 + distance)
+    
+    def _manhattan_distance(self, vector_a: np.array, vector_b: np.array) -> float:
+        """Manhattan distance converted to similarity"""
+        distance = cityblock(vector_a, vector_b)
+        return 1 / (1 + distance)
+    
+    def search_with_metric(self, query_text: str, k: int, distance_measure: str = 'cosine'):
+        """Search using different distance metrics"""
+        if distance_measure not in self.distance_metrics:
+            raise ValueError(f"Unknown metric: {distance_measure}. Use: {list(self.distance_metrics.keys())}")
+        
+        query_vector = self.embedding_model.get_embedding(query_text)
+        distance_func = self.distance_metrics[distance_measure]
+        
+        # Calculate scores with chosen metric
+        scores = [
+            (key, distance_func(query_vector, vector))
+            for key, vector in self.vectors.items()
+        ]
+        
+        # Return top k results
+        return sorted(scores, key=lambda x: x[1], reverse=True)[:k]
