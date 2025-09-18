@@ -95,7 +95,6 @@ class SimpleEnhancedVectorDatabase(VectorDatabase):
     
     def _cosine_similarity(self, vector_a: np.array, vector_b: np.array) -> float:
         """Your existing cosine similarity"""
-        from aimakerspace.vectordatabase import cosine_similarity
         return cosine_similarity(vector_a, vector_b)
     
     def _euclidean_distance(self, vector_a: np.array, vector_b: np.array) -> float:
@@ -123,4 +122,6 @@ class SimpleEnhancedVectorDatabase(VectorDatabase):
         ]
         
         # Return top k results
-        return sorted(scores, key=lambda x: x[1], reverse=True)[:k]
+        results = sorted(scores, key=lambda x: x[1], reverse=True)[:k]
+        
+        return results

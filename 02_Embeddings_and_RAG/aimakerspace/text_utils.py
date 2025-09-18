@@ -148,7 +148,7 @@ class EnhancedTextFileLoader:
             raise ValueError(f"Failed to load YouTube transcript: {str(e)}")
     
     def _load_pdf(self) -> List[str]:
-        """Load PDF file using PyPDF2"""
+        """Load PDF file using PyPDF2 with improved text extraction"""
         try:
             with open(self.path_or_url, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -158,15 +158,25 @@ class EnhancedTextFileLoader:
                 for page_num, page in enumerate(pdf_reader.pages):
                     try:
                         page_text = page.extract_text()
-                        if page_text.strip():  # Only add non-empty pages
-                            text += f"\n--- Page {page_num + 1} ---\n"
-                            text += page_text + "\n"
+                        
+                        # Clean and validate extracted text
+                        if page_text and page_text.strip():
+                            # Remove null bytes and other problematic characters
+                            cleaned_text = page_text.replace('\x00', '').replace('\ufffd', '')
+                            
+                            # Check if text is mostly readable (not binary/encoded)
+                            if self._is_readable_text(cleaned_text):
+                                text += f"\n--- Page {page_num + 1} ---\n"
+                                text += cleaned_text + "\n"
+                            else:
+                                print(f"Warning: Page {page_num + 1} contains unreadable text, skipping")
+                                
                     except Exception as e:
                         print(f"Warning: Could not extract text from page {page_num + 1}: {e}")
                         continue
                 
                 if not text.strip():
-                    raise ValueError("No text could be extracted from the PDF")
+                    raise ValueError("No readable text could be extracted from the PDF")
                 
                 self.documents.append(text)
                 self.metadata.append({
@@ -182,7 +192,23 @@ class EnhancedTextFileLoader:
             raise ValueError(f"PDF file not found: {self.path_or_url}")
         except Exception as e:
             raise ValueError(f"Failed to load PDF: {str(e)}")
-    
+
+    def _is_readable_text(self, text: str, min_readable_ratio: float = 0.7) -> bool:
+        """Check if text contains mostly readable characters"""
+        if not text or len(text) < 10:
+            return False
+        
+        # Count printable characters
+        printable_chars = sum(1 for c in text if c.isprintable() or c.isspace())
+        readable_ratio = printable_chars / len(text)
+        
+        # Additional check: ensure it's not mostly encoded/base64-like
+        base64_chars = sum(1 for c in text if c.isalnum() or c in '+/=')
+        if base64_chars / len(text) > 0.9 and ' ' not in text[:100]:
+            return False
+        
+        return readable_ratio >= min_readable_ratio
+
     def _load_txt(self) -> List[str]:
         """Load text file"""
         try:
