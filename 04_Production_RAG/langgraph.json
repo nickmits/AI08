@@ -1,0 +1,5 @@
+{
+    "graphs": { "main": "my_graph:graph" },
+    "dependencies": ["langgraph", "langgraph-cli", "langchain-core"],
+    "env": ".env"
+  }
