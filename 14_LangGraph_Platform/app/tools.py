@@ -15,6 +15,7 @@ from app.rag import retrieve_information
 def get_tool_belt() -> List:
     """Return the list of tools available to agents (Tavily, Arxiv, RAG)."""
     tavily_tool = TavilySearchResults(max_results=5)
+    tavily_tool.name = "web_search"  # Add this line to rename the tool
     return [tavily_tool, ArxivQueryRun(), retrieve_information]
 
 
