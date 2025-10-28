@@ -39,18 +39,27 @@ Run the repository and complete the following:
 Compare the `agent` and `agent_helpful` assistants defined in `langgraph.json`. Where does the helpfulness evaluator fit in the graph, and under what condition should execution route back to the agent vs. terminate?
 
 ##### ✅ Answer:
-_(enter answer here)_
-
+The helpfulness evaluator is a separate node called "helpfulness" that sits between the agent's response and the graph's termination point. 
+Where it fits:
+After the agent responds WITHOUT tool calls, execution routes to the helpfulness node (instead of ending immediately like in the agent assistant)
+The flow is: agent → (if no tool calls) → helpfulness → (decision) → either back to agent or END
+Routing conditions:
+Route back to agent (continue): When the helpfulness evaluator returns "HELPFULNESS:N" (response is NOT helpful), the graph loops back to give the agent another chance to provide a better answer
+Terminate (end or END): When the helpfulness evaluator returns "HELPFULNESS:Y" (response IS helpful), OR when the loop limit is exceeded (>10 messages as a safety guard against infinite loops)
+The key difference from agent is that agent_helpful has this quality-control loop that evaluates responses before allowing the graph to terminate.
 #### 🏗️ Activity #1 Debugging A Graph
 
 Select the `agent_with_helpfulness` and set one or more interrupts (at least one `Before` and one `After`). Try changing values and continuing the turn. 
 
 #### ❓ Question 2:
-
 What are your thoughts on when you would use a Before interrupt vs. an After interrupt?
 
+
 ##### ✅ Answer:
-_(enter answer here)_
+
+Before interrupts let you inspect and control what's about to happen. I paused before the action node and could see the web search query ("top techno DJs 2025") before execution - useful for preventing unwanted tool calls or modifying parameters before they run.
+After interrupts let you inspect results after execution. You could see the search results with their relevance scores (e.g., 0.8974) and potentially filter low-quality results or add context before the agent processes them.
+In practice: Use Before interrupts to control inputs and prevent actions; use After interrupts to validate and modify outputs before they flow to the next node.
 
 
 
