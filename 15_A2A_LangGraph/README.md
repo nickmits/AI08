@@ -89,7 +89,14 @@ What are the core components of an `AgentCard`?
 
 ##### ✅ Answer:
 
-<br />
+The core components of an `AgentCard` are:
+
+1. **Identity & Metadata**: `name`, `description`, `url`, and `version` - identifies the agent and where to reach it
+2. **Input/Output Modes**: `default_input_modes` and `default_output_modes` - specifies supported content types (e.g., "text", "text/plain")
+3. **Capabilities**: `capabilities` object declaring protocol features like `streaming` and `push_notifications`
+4. **Skills**: List of `AgentSkill` objects describing what the agent can do, including `id`, `name`, `description`, `tags`, and example queries
+
+See `app/__main__.py:72-81` for the implementation example.
 
 ### ❓ Question #2:
 
@@ -97,7 +104,17 @@ Why is A2A (and other such protocols) important in your own words?
 
 ##### ✅ Answer:
 
-<br /><br />
+A2A protocol is important because it enables **standardized agent-to-agent communication**, similar to how HTTP standardized web communication. Key benefits:
+
+1. **Interoperability**: Any client agent can communicate with any server agent using A2A, regardless of framework or implementation
+2. **Composability**: Build complex AI systems from specialized agents that use each other as tools via A2A
+3. **Reusability**: One powerful agent can serve many clients without duplicating capabilities
+4. **Scalability**: Enable distributed agent architectures with load balancing and horizontal scaling
+5. **Future-proofing**: Standardized protocols prevent vendor lock-in and allow system evolution without breaking existing integrations
+
+Essentially, **A2A is to AI agents what HTTP is to web services** - a foundational protocol enabling an entire ecosystem to scale and interoperate.
+
+<br />
 
 <details>
 <summary>🚧 Advanced Build 🚧 (OPTIONAL - <i>open this section for the requirements</i>)</summary>
