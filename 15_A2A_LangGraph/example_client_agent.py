@@ -198,7 +198,7 @@ async def main():
         # await multi_turn_conversation_example()
 
         # Wait a bit between examples
-        # await asyncio.sleep(2)
+        await asyncio.sleep(2)
 
         # Run Example 3: Different tool types
         # Uncomment to run this example:
@@ -208,11 +208,9 @@ async def main():
         logger.error(f"Error running examples: {e}", exc_info=True)
 
     finally:
-        # Clean up resources
         await cleanup_a2a_client()
         logger.info("\n✅ Examples complete! Client resources cleaned up.\n")
 
 
 if __name__ == "__main__":
-    # Run the examples
     asyncio.run(main())

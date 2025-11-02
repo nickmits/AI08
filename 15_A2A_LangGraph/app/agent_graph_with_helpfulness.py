@@ -117,18 +117,30 @@ def build_agent_graph_with_helpfulness(model, system_instruction, format_instruc
                     method="json_schema",
                     include_raw=False
                 )
-                
+
                 # Add system and format instructions
                 formatted_messages = [("system", f"{system_instruction}\n\n{format_instruction}")] + state["messages"]
                 structured_response = model_with_format.invoke(formatted_messages)
-                
+
                 return {
                     "messages": [response],
                     "structured_response": structured_response
                 }
-            except:
-                # If structured output fails, just return the response
-                return {"messages": [response]}
+            except Exception as e:
+                # If structured output fails, create a default structured response
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to generate structured response: {e}")
+
+                # Create a default structured response based on the content
+                default_response = ResponseFormat(
+                    status="completed",
+                    message=response.content if hasattr(response, 'content') else "Task completed"
+                )
+                return {
+                    "messages": [response],
+                    "structured_response": default_response
+                }
         else:
             # If there are tool calls, just return the response
             return {"messages": [response]}

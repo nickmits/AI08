@@ -135,28 +135,27 @@ async def call_a2a_agent(
 
     # Extract the response data
     result = response.root.result
-    response_message = result.message
 
-    # Get the text content from the response
-    text_content = ""
-    if response_message and response_message.parts:
-        for part in response_message.parts:
-            if hasattr(part.root, 'text'):
-                text_content += part.root.text
-
-    # Also check artifacts for additional content
-    artifacts_content = ""
+    # The result is a Task object. Get the content from artifacts
+    full_content = ""
     if result.artifacts:
         for artifact in result.artifacts:
             if artifact.parts:
                 for part in artifact.parts:
                     if hasattr(part.root, 'text'):
-                        artifacts_content += part.root.text
+                        full_content += part.root.text
 
-    # Combine content
-    full_content = text_content + artifacts_content if artifacts_content else text_content
-
-    logger.info(f"Received response from A2A agent: {full_content[:100]}...")
+    # If no artifacts, check the history for the last agent message
+    if not full_content and hasattr(result, 'history') and result.history:
+        for message in reversed(result.history):
+            if hasattr(message, 'role') and message.role.value == 'agent':
+                if message.parts:
+                    for part in message.parts:
+                        if hasattr(part.root, 'text'):
+                            full_content = part.root.text
+                            break
+                if full_content:
+                    break
 
     return {
         "content": full_content,
@@ -214,10 +213,10 @@ def build_client_agent(base_url: str = "http://localhost:10000"):
                 content=(
                     "You are a client agent that helps users by communicating with a remote A2A agent. "
                     "The remote agent has access to web search, academic paper search, and document retrieval tools. "
-                    "When a user asks a question, use the call_a2a_agent tool to get information from the remote agent. "
+                    "When a user asks a question, use the call_a2a_agent tool ONCE to get information from the remote agent. "
                     f"The A2A server base URL is: {base_url}. "
-                    "If you need to ask follow-up questions, use the task_id and context_id from previous responses. "
-                    "Always provide the user's original query directly to the A2A agent - don't modify it."
+                    "Always return the response from the A2A agent directly to the user without modifying it. "
+                    "Do NOT rephrase or call the tool multiple times for the same query."
                 )
             )
             messages = [system_message] + messages
